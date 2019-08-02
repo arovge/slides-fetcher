@@ -10,6 +10,10 @@ def represents_int(s):
     except ValueError:
         return False
 
+def get_week_num(s):
+    s = str(s.contents[0])
+    return int(s)
+
 def main():
     # setup bs4 from url contents
     #url = input('url: ')
@@ -40,7 +44,18 @@ def main():
         # determine if this is a new week
         first_cell = row.find('td')
         if represents_int(first_cell):
-            print(first_cell)
+            week_num = get_week_num(first_cell)
+            cells = row.find_all('td')
+            del cells[0]
+            week_content = []
+            for items in cells:
+                week_content.append(items)
+            weeks.append(week_content)
+    print(weeks)
+
+        # weeks
+        # [thing one, thing two, thing three]
+        # link objects? some sort of custom object?
 
 if __name__ == '__main__':
     main()
