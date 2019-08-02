@@ -1,58 +1,46 @@
 #!/usr/bin/env python3
-
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
-# get the url into the soup
-#url = input('url: ')
-url = 'http://jayurbain.com/msoe/cs4881/outline.html'
-page = requests.get(url)
-soup = BeautifulSoup(page.content, 'html.parser')
+def represents_int(s):
+    s = str(s.contents[0])
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
 
-# find the table that we should parse
-table = soup.find('table')
-inner_table = table.find('table')
-if inner_table is not None:
-    table = inner_table
+def main():
+    # setup bs4 from url contents
+    #url = input('url: ')
+    url = 'http://jayurbain.com/msoe/cs3851/outline.html'
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
 
-# some tables may not have a tbody
-tbody = table.find('tbody')
-if tbody is not None:
-    table = tbody
+    # find the table that we should parse
+    # bs4 is dumb otherwise this could be one method
+    table = soup.find('table')
+    inner_table = table.find('table')
+    inner_table_body = inner_table.find('tbody')
+    if inner_table is not None:
+        table = inner_table_body
 
-# what to store each week of content in
-weeks = []
-rows = table.find_all('tr')
-# remove the first index
-del rows[0]
+    # what to store each week of content in
+    weeks = []
+    rows = table.find_all('tr')
 
-# loop through all rows and begin processing
-for row in rows:
-    cells = row.find_all('td')
-    for cell in cells:
-        links = cell.find_all('a')
-        
-        for link in links:
-            if link.name == 'a':
-                print(link.get_text())
-        # print(cell)
-    # if first_cell_text.isdigit():
-    #     weeks.append({
-    #         'week': int(first_cell_text),
-    #         cells[1].get_text(): cells[2].get_text()
-    #     })
-    # else:
-    #     weeks[-1][cells[0].get_text()] = cells[1].get_text()
-    # print(f'{row}\n\n')
-    
-    # cells = row.find_all('td')
-    # weeks.append({
-    #     week: int(first_cell_text),
+    # remove the first index containing the column keys
+    del rows[0]
 
-    # })
-    # cells = row.find('td')
-    # print(cells)
-    # print(f'{cells[0].get_text()} and {cells[1].get_text()}')
-# for week in weeks:
-#     print(week)
-    
+    # remove brs
+    for e in soup.findAll('br'):
+        e.extract()
+
+    for row in rows:
+        # determine if this is a new week
+        first_cell = row.find('td')
+        if represents_int(first_cell):
+            print(first_cell)
+
+if __name__ == '__main__':
+    main()
