@@ -7,4 +7,4 @@ register-me==0.1
 requests==2.22.0
 slides-fetcher==0.1
 soupsieve==1.9.1
-urllib3==1.25.2
+urllib3==1.25.8
